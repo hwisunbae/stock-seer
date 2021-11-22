@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% include "head_part.html" %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+</head>
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    {% include "sidebar_part.html" %}
+
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            {% include "topbar_part.html" %}
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="align-items-center justify-content-between mb-4">
+                    <!--  Image loader  -->
+                    <div id="loader" style="text-align:center; display:none;"><img src="../static/img/loading.gif" alt="loading"></div>
+
+                    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+
+                    <div class="input-group" style="width: auto; margin-bottom: 20px;">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text" id="btnGroupAddon">Fetch Twitter</div>
+                        </div>
+                        <input disabled="disabled" type="text" name="daterange" value="05/01/2021 - 09/30/2021" class="form-control" aria-label="Input group example" aria-describedby="btnGroupAddon" />
+                    </div>
+                    <a href="#" id="generate-finance-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                            class="fas fa-download fa-sm text-white-50"></i> Generate Finance Report</a>
+                    <a href="#" id="visualize-finance-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-chart-bar"></i> Visualize Finance Report</a>
+                    <a href="#" id="generate-tweet-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                            class="fas fa-download fa-sm text-white-50"></i> Generate Tweet Report</a>
+                    <a href="#" id="visualize-tweet-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                            <i class="fas fa-chart-pie"></i> Visualize Tweet Report</a>
+                </div>
+
+                <!-- Content Row -->
+                <div class="row">
+
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Earnings (Monthly)</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Earnings (Annual)</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
+                                        </div>
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col-auto">
+                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="progress progress-sm mr-2">
+                                                    <div class="progress-bar bg-info" role="progressbar"
+                                                         style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+                                                         aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Requests Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Pending Requests</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row -->
+
+                <div class="row">
+
+                    <!-- Area Chart -->
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <!-- Card Header - Dropdown -->
+                            <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Stock Index - Adj Closing Value</h6>
+                                <div class="dropdown no-arrow">
+                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                         aria-labelledby="dropdownMenuLink">
+                                        <div class="dropdown-header">Dropdown Header:</div>
+                                        <a class="dropdown-item" href="#">Action</a>
+                                        <a class="dropdown-item" href="#">Another action</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Something else here</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card Body -->
+                            <div class="card-body">
+                                <div class="chart-area">
+                                    <canvas id="finance-chart" data-url="{% url 'visualize_finance_report' %}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pie Chart -->
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <!-- Card Header - Dropdown -->
+                            <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Polarity Ratio</h6>
+                                <div class="dropdown no-arrow">
+                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                         aria-labelledby="dropdownMenuLink">
+                                        <div class="dropdown-header">Dropdown Header:</div>
+                                        <a class="dropdown-item" href="#">Action</a>
+                                        <a class="dropdown-item" href="#">Another action</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Something else here</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card Body -->
+                            <div class="card-body">
+                                <div class="chart-pie pt-4 pb-2">
+                                    <canvas id="tweet-circle-chart" data-url="{% url 'visualize_tweet_report' %}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Row -->
+                <div class="row">
+
+                    <!-- Content Column -->
+                    <div class="col-lg-12 mb-12">
+
+                        <!-- Project Card Example -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="small font-weight-bold">Server Migration <span
+                                        class="float-right">20%</span></h4>
+                                <div class="progress mb-4">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"
+                                         aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <h4 class="small font-weight-bold">Sales Tracking <span
+                                        class="float-right">40%</span></h4>
+                                <div class="progress mb-4">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 40%"
+                                         aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <h4 class="small font-weight-bold">Customer Database <span
+                                        class="float-right">60%</span></h4>
+                                <div class="progress mb-4">
+                                    <div class="progress-bar" role="progressbar" style="width: 60%"
+                                         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <h4 class="small font-weight-bold">Payout Details <span
+                                        class="float-right">80%</span></h4>
+                                <div class="progress mb-4">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 80%"
+                                         aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <h4 class="small font-weight-bold">Account Setup <span
+                                        class="float-right">Complete!</span></h4>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%"
+                                         aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+
+<!--                        &lt;!&ndash; Color System &ndash;&gt;-->
+<!--                        <div class="row">-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-primary text-white shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Primary-->
+<!--                                        <div class="text-white-50 small">#4e73df</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-success text-white shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Success-->
+<!--                                        <div class="text-white-50 small">#1cc88a</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-info text-white shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Info-->
+<!--                                        <div class="text-white-50 small">#36b9cc</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-warning text-white shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Warning-->
+<!--                                        <div class="text-white-50 small">#f6c23e</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-danger text-white shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Danger-->
+<!--                                        <div class="text-white-50 small">#e74a3b</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-secondary text-white shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Secondary-->
+<!--                                        <div class="text-white-50 small">#858796</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-light text-black shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Light-->
+<!--                                        <div class="text-black-50 small">#f8f9fc</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-lg-6 mb-4">-->
+<!--                                <div class="card bg-dark text-white shadow">-->
+<!--                                    <div class="card-body">-->
+<!--                                        Dark-->
+<!--                                        <div class="text-white-50 small">#5a5c69</div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+                    </div>
+
+<!--                    <div class="col-lg-6 mb-4">-->
+
+<!--                        &lt;!&ndash; Illustrations &ndash;&gt;-->
+<!--                        <div class="card shadow mb-4">-->
+<!--                            <div class="card-header py-3">-->
+<!--                                <h6 class="m-0 font-weight-bold text-primary">Illustrations</h6>-->
+<!--                            </div>-->
+<!--                            <div class="card-body">-->
+<!--                                <div class="text-center">-->
+<!--                                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"-->
+<!--                                         src="/static/img/undraw_posting_photo.svg" alt="">-->
+<!--                                </div>-->
+<!--                                <p>Add some quality, svg illustrations to your project courtesy of <a-->
+<!--                                        target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a-->
+<!--                                    constantly updated collection of beautiful svg images that you can use-->
+<!--                                    completely free and without attribution!</p>-->
+<!--                                <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse Illustrations on-->
+<!--                                    unDraw &rarr;</a>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        &lt;!&ndash; Approach &ndash;&gt;-->
+<!--                        <div class="card shadow mb-4">-->
+<!--                            <div class="card-header py-3">-->
+<!--                                <h6 class="m-0 font-weight-bold text-primary">Development Approach</h6>-->
+<!--                            </div>-->
+<!--                            <div class="card-body">-->
+<!--                                <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classes in order to reduce-->
+<!--                                    CSS bloat and poor page performance. Custom CSS classes are used to create-->
+<!--                                    custom components and custom utility classes.</p>-->
+<!--                                <p class="mb-0">Before working with this theme, you should become familiar with the-->
+<!--                                    Bootstrap framework, especially the utility classes.</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                    </div>-->
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        {% include "footer_part.html" %}
+
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+{% include "modals_and_scripts_part.html" %}
+
+<!-- Page level plugins -->
+<script src="/static/vendor/chart.js/Chart.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="/static/js/demo/chart-area-demo.js"></script>
+<script src="/static/js/demo/chart-pie-demo.js"></script>
+
+<!-- Date range picker-->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+    $(function() {
+        $('input[name="daterange"]').daterangepicker({
+            opens: 'left',
+        }, function(start, end, label) {
+            alert("This is a demo to fetch twitter API. \nDate range is fixed from 2021-05-01 to 2021-09-30")
+        })
+
+        $('#generate-finance-report').click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/generate_finance_report',
+                beforeSend: function(){
+                    $('#loader').show();
+                },
+                complete: function(){
+                    $('#loader').hide();
+                },
+                success: function(result) {
+                    alert('Stock objects are created from yfinance API')
+                }
+            })
+        })
+
+        $('#generate-tweet-report').click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/generate_tweet_report',
+                beforeSend: function(){
+                    $('#loader').show();
+                },
+                complete: function(){
+                    $('#loader').hide();
+                },
+                success: function(result) {
+                    alert('Tweet objects are created from yfinance API')
+                }
+            })
+        })
+
+        $('#visualize-finance-report').click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/visualize_finance_report',
+                beforeSend: function(){
+                    $('#loader').show();
+                },
+                complete: function(){
+                    $('#loader').hide();
+                },
+                success: function(data) {
+                    let $chart = $("#finance-chart");
+                    $.ajax({
+                        url: $chart.data('url'),
+                        success: function(data){
+                            let ctx = $chart[0].getContext("2d");
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: data.labels,
+                                    datasets: [{
+                                        label: 'Stock index',
+                                        lineTension: 0.3,
+                                        backgroundColor: "rgba(78, 115, 223, 0.05)",
+                                        borderColor: "rgba(78, 115, 223, 1)",
+                                        pointRadius: 3,
+                                        pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                                        pointBorderColor: "rgba(78, 115, 223, 1)",
+                                        pointHoverRadius: 3,
+                                        pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                                        pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                                        pointHitRadius: 10,
+                                        pointBorderWidth: 2,
+                                        data: data.data
+                                    }]
+                                },
+                                options: {
+                                    maintainAspectRatio: false,
+                                    layout: {
+                                        padding: {
+                                            left: 10,
+                                            right: 25,
+                                            top: 25,
+                                            bottom: 0
+                                        }
+                                    },
+                                    legend: {
+                                        display: true
+                                    },
+                                    tooltips: {
+                                        backgroundColor: "rgb(255,255,255)",
+                                        bodyFontColor: "#858796",
+                                        titleMarginBottom: 10,
+                                        titleFontColor: '#6e707e',
+                                        titleFontSize: 14,
+                                        borderColor: '#dddfeb',
+                                        borderWidth: 1,
+                                        xPadding: 15,
+                                        yPadding: 15,
+                                        displayColors: false,
+                                        intersect: false,
+                                        mode: 'index',
+                                        caretPadding: 10,
+                                        callbacks: {
+                                            label: function(tooltipItem, chart) {
+                                                var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                                                return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                                            }
+                                        }
+                                    }
+
+                                }
+                            })
+                        }
+                    })
+
+                    alert('Visualizing stock objects from yfinance API')
+                }
+            })
+        })
+
+        $('#visualize-tweet-report').click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/visualize_tweet_report',
+                beforeSend: function () {
+                    $('#loader').show();
+                },
+                complete: function () {
+                    $('#loader').hide();
+                },
+                success: function (data) {
+                    var ctx = document.getElementById("tweet-circle-chart");
+                    var myPieChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ["Positive", "Neutral", "Negative"],
+                            datasets: [{
+                                data: data.data,
+                                backgroundColor: ['#4bb6bf', '#fbb74a', '#f04f52'],
+                                hoverBackgroundColor: ['#009aa8', '#db9421', '#eb282c'],
+                                hoverBorderColor: "rgba(234, 236, 244, 1)",
+                            }],
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            tooltips: {
+                                backgroundColor: "rgb(255,255,255)",
+                                bodyFontColor: "#858796",
+                                borderColor: '#dddfeb',
+                                borderWidth: 1,
+                                xPadding: 15,
+                                yPadding: 15,
+                                displayColors: false,
+                                caretPadding: 10,
+                            },
+                            legend: {
+                                display: true
+                            },
+                            cutoutPercentage: 80,
+                        },
+                    });
+
+                    alert('good')
+                }
+            })
+
+        })
+
+    });
+
+
+</script>
+
+
+</body>
+
+</html>
