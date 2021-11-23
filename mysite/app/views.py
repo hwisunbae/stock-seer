@@ -1,18 +1,15 @@
 import csv
 import os
+import pandas as pd
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import ObjectDoesNotExist
+
+from .backend.tweet_sa import *
 from .models import *
-
-
-def index(request):
-    if request.user.is_anonymous:
-        return redirect("/login.html")
-    return html(request, "index")
 
 
 def html(request, filename):
@@ -43,14 +40,20 @@ def html(request, filename):
         print("login")
         print(username, password)
     print(filename, request.method)
-    if filename in ["buttons", "cards"]:
-        context["collapse"] = "components"
-    if filename in ["utilities-color", "utilities-border", "utilities-animation", "utilities-other"]:
-        context["collapse"] = "utilities"
+    if filename in ["tables"]:
+        context["positive_tweets"] = Tweets.objects.all().order_by('-polarity')[0:100]
+        context["negative_tweets"] = Tweets.objects.all().order_by('polarity')[0:100]
+        context["neutral_tweets"] = Tweets.objects.all().filter(analysis=0)[0:100]
     if filename in ["404", "blank"]:
         context["collapse"] = "pages"
 
     return render(request, f"{filename}.html", context=context)
+
+
+def index(request):
+    if request.user.is_anonymous:
+        return redirect("/login.html")
+    return html(request, "index")
 
 
 def generate_finance_report(request):
@@ -133,5 +136,13 @@ def visualize_tweet_report(request):
 
     return JsonResponse(data={
         'labels': labels,
+        'data': data,
+    })
+
+
+def word_cloud(request):
+    tweet_df = pd.DataFrame(list(Tweets.objects.all().values()))
+    data = get_idf_value(tweet_df)
+    return JsonResponse(data={
         'data': data,
     })
