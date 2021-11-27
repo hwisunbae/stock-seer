@@ -1,21 +1,26 @@
 import csv
+import json
 import os
 import pandas as pd
+from django.core import serializers
+import json
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import ObjectDoesNotExist
+from django.views.decorators.csrf import csrf_exempt
 
 from .backend.tweet_sa import *
 from .models import *
 
 
-def html(request, filename):
+@csrf_exempt
+def html(request, filename, *args):
     context = {"filename": filename,
                "collapse": ""}
-    if request.user.is_anonymous and filename != "login":
+    if request.user.is_anonymous and filename not in ["login", "register", "forgot-password"]:
         return redirect("/login.html")
     if filename == "logout":
         logout(request)
@@ -40,10 +45,29 @@ def html(request, filename):
         print("login")
         print(username, password)
     print(filename, request.method)
-    if filename in ["tables"]:
-        context["positive_tweets"] = Tweets.objects.all().order_by('-polarity')[0:100]
-        context["negative_tweets"] = Tweets.objects.all().order_by('polarity')[0:100]
-        context["neutral_tweets"] = Tweets.objects.all().filter(analysis=0)[0:100]
+    if filename in ["register"]:
+        print('register...')
+        if request.POST:
+            userObj = User.objects.create_user(first_name=request.POST.get('first_name'),
+                                               last_name=request.POST.get('last_name'),
+                                               username=request.POST.get('user_name'),
+                                               email=request.POST.get('email'),
+                                               password=request.POST.get('password'))
+            userObj.save()
+    # if filename in ["tables"]:
+        # try:
+        #     # print(args[0])
+        #     objs = Tweets.objects.filter(created_at__range=[args[0], args[1]])
+        #     # objs = Tweets.objects.filter(created_at__range=['2021-05-04', '2021-05-05'])
+        #
+        #     context["positive_tweets"] = objs.all().order_by('-polarity')[0:100]
+        #     context["negative_tweets"] = objs.all().order_by('polarity')[0:100]
+        #     context["neutral_tweets"] = objs.all().filter(analysis=0)[0:100]
+        # except IndexError:
+        #     print('When page loading first time, selected date is not selected.')
+        # # return render(request, f"{filename}.html", context=context)
+        # return HttpResponse(data, content_type="application/json")
+
     if filename in ["404", "blank"]:
         context["collapse"] = "pages"
 
@@ -146,3 +170,16 @@ def word_cloud(request):
     return JsonResponse(data={
         'data': data,
     })
+
+
+def fetch_tweet(request):
+    picked_start = request.GET['picked_start']
+    picked_end = request.GET['picked_end']
+
+    objs = Tweets.objects.filter(created_at__range=[picked_start, picked_end])
+    all_tweets = objs.all()
+
+    data = serializers.serialize('json', all_tweets)
+    # print(data)
+
+    return HttpResponse(data, content_type="application/json")

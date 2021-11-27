@@ -24,13 +24,14 @@ urlpatterns = [
     path('<filename>.html', views.html),
 
 
-
     path('generate_finance_report/', views.generate_finance_report),
     path('generate_tweet_report/', views.generate_tweet_report),
     path('visualize_finance_report/', views.visualize_finance_report, name='visualize_finance_report'),
     path('visualize_tweet_report/', views.visualize_tweet_report, name='visualize_tweet_report'),
     path('word_cloud/', views.word_cloud, name='word_cloud'),
+    path('fetch_tweet/', views.fetch_tweet),
 
     path('', views.index),
+
 
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
