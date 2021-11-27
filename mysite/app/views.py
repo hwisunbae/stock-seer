@@ -66,27 +66,53 @@ def index(request):
     return html(request, "index")
 
 
-def generate_finance_report(request):
-    if request.GET:
-        pass
-    else:
-        dirname = os.path.dirname
-        # Creating stock obj
-        path = os.path.join(dirname(dirname(__file__)), 'backend', 'data', 'yfinance', 'preprocessed_yfinance.csv')
-        with open(path) as f:
-            reader = csv.reader(f)
-            next(reader)
-            for row in reader:
-                obj, created = Stock.objects.get_or_create(
-                    date=row[0],
-                    adj_close=row[1],
-                    close=row[2],
-                    volume=row[3]
-                )
-                obj.save()
-        print(Stock.objects.all())
-        return HttpResponse('successfully generated report')
-
+# def generate_finance_report(request):
+#     if request.GET:
+#         pass
+#     else:
+#         dirname = os.path.dirname
+#         # Creating stock obj
+#         path = os.path.join(dirname(dirname(__file__)), 'backend', 'data', 'yfinance', 'preprocessed_yfinance.csv')
+#         with open(path) as f:
+#             reader = csv.reader(f)
+#             next(reader)
+#             for row in reader:
+#                 obj, created = Stock.objects.get_or_create(
+#                     date=row[0],
+#                     adj_close=row[1],
+#                     close=row[2],
+#                     volume=row[3]
+#                 )
+#                 obj.save()
+#         print(Stock.objects.all())
+#         return HttpResponse('successfully generated report')
+#
+#
+# def generate_tweet_report(request):
+#     if request.GET:
+#         pass
+#     else:
+#         dirname = os.path.dirname
+#         # Creating tweet obj
+#         path = os.path.join(dirname(dirname(__file__)), 'backend', 'data', 'sa_tweets.csv')
+#         with open(path) as f:
+#             reader = csv.reader(f)
+#             next(reader)
+#             for row in reader:
+#                 obj, created = Tweets.objects.get_or_create(
+#                     tweet_id=row[0],
+#                     created_at=row[1],
+#                     user_name=row[2],
+#                     text=row[3],
+#                     lang=row[4],
+#                     tokens=row[5],
+#                     subjectivity=row[6],
+#                     polarity=row[7],
+#                     analysis=row[8]
+#                 )
+#                 obj.save()
+#         print(Tweets.objects.all())
+#         return HttpResponse('successfully generated report')
 
 def visualize_finance_report(request):
     labels = []
@@ -103,50 +129,39 @@ def visualize_finance_report(request):
     })
 
 
-def generate_tweet_report(request):
-    if request.GET:
-        pass
-    else:
-        dirname = os.path.dirname
-        # Creating tweet obj
-        path = os.path.join(dirname(dirname(__file__)), 'backend', 'data', 'sa_tweets.csv')
-        with open(path) as f:
-            reader = csv.reader(f)
-            next(reader)
-            for row in reader:
-                obj, created = Tweets.objects.get_or_create(
-                    tweet_id=row[0],
-                    created_at=row[1],
-                    user_name=row[2],
-                    text=row[3],
-                    lang=row[4],
-                    tokens=row[5],
-                    subjectivity=row[6],
-                    polarity=row[7],
-                    analysis=row[8]
-                )
-                obj.save()
-        print(Tweets.objects.all())
-        return HttpResponse('successfully generated report')
-
-
 def visualize_tweet_report(request):
-    labels = ['1', '0', '-1']
-    data = [0, 0, 0]
+    picked_start = request.GET['picked_start']
+    picked_end = request.GET['picked_end']
+    print(picked_start, picked_end)
 
-    queryset = Tweets.objects.all().order_by('created_at')
+    # Polarity Ratio
+    ratio_labels = ['1', '0', '-1']
+    ratio_data = [0, 0, 0]
+
+    queryset = Tweets.objects.all().filter(created_at__range=[picked_start, picked_end])
     for entry in queryset:
-        if str(entry.analysis) == labels[0]:
-            data[0] = data[0] + 1
-        elif str(entry.analysis) == labels[2]:
-            data[2] = data[2] + 1
+        if str(entry.analysis) == ratio_labels[0]:
+            ratio_data[0] = ratio_data[0] + 1
+        elif str(entry.analysis) == ratio_labels[2]:
+            ratio_data[2] = ratio_data[2] + 1
         else:
-            data[1] = data[1] + 1
-    print(data, labels)
+            ratio_data[1] = ratio_data[1] + 1
+    print(ratio_labels, ratio_data)
+
+    # Stock Index
+    stock_labels = []
+    stock_data = []
+
+    queryset = Stock.objects.all().filter(date__range=[picked_start, picked_end]).order_by('date')
+    for entry in queryset:
+        stock_labels.append(entry.date)
+        stock_data.append(entry.adj_close)
 
     return JsonResponse(data={
-        'labels': labels,
-        'data': data,
+        'ratio_labels': ratio_labels,
+        'ratio_data': ratio_data,
+        'stock_labels': stock_labels,
+        'stock_data': stock_data,
     })
 
 
