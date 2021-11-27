@@ -9,6 +9,7 @@
 
     <!-- Load d3-cloud -->
     <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+    <script src="../static/js/demo/word-cloud.js"></script>
 
 
 </head>
@@ -29,14 +30,29 @@
             {% include "topbar_part.html" %}
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
+                <div id="loader" style="text-align:center; display:none;"><img src="../static/img/loader.gif" alt="loading"></div>
+                <div id="main-content" class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Charts</h1>
-                    <p class="mb-4">Chart.js is a third party plugin that is used to generate the charts in this theme.
-                        The charts below have been customized - for further customization options, please visit the <a
-                            target="_blank" href="https://www.chartjs.org/docs/latest/">official Chart.js
-                            documentation</a>.</p>
+                    <h1 class="h3 mb-2 text-gray-800">Trending Words</h1>
+                    <p class="mb-4">This page illustrates some of trending words that comes up the most during the date you picked.
+                        Weighted value in each word is computed based on IDF, short for inverse document frequency.
+                        This term frequency reflects how important a word is to a document in a corpus.
+                        The lower the IDF value, the less unique word appearing in the documents.
+                    </p>
+
+                     <div class="row">
+                        <div class="input-group mb-4 col-xl-10">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text" id="btnGroupAddon">Selected Date</div>
+                            </div>
+                            <input type="text" name="daterange" class="form-control" aria-label="Input group example" aria-describedby="btnGroupAddon" />
+                        </div>
+                        <div class="buttons mb-4 col-xl-2">
+                            <button href="#" id="fetch-tweets" class="d-none d-sm-inline-block btn btn-middle btn-primary shadow-sm"><i
+                                    class="fas fa-download fa-sm text-white-50"></i> Fetch Tweets</button>
+                        </div>
+                    </div>
 
                     <!-- Content Row -->
                     <div class="row">
@@ -46,55 +62,20 @@
                             <!-- Area Chart -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Word Cloud Chart</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Unique Word Cloud Chart</h6>
                                 </div>
                                 <div class="card-body">
-                                    <div class="chart-area wordcloud-wrapper" style="height:640px">
-                                        <div id="wordcloud-chart" style="height:550px"></div>
+                                    <div class="chart-area wordcloud-wrapper" style="height:400px">
+                                        <div id="wordcloud-chart" style="height:400px"></div>
                                     </div>
                                     <hr>
-                                    Weighted value in each word is computed based on IDF, short for inverse document frequency.
-                                    This term frequency reflects how important a word is to a document in a corpus.
-                                    The lower the IDF value, the less unique word appearing in the documents.
+                                    <div id="description">
+
+                                    </div>
                                 </div>
                             </div>
-
-<!--                            &lt;!&ndash; Bar Chart &ndash;&gt;-->
-<!--                            <div class="card shadow mb-4">-->
-<!--                                <div class="card-header py-3">-->
-<!--                                    <h6 class="m-0 font-weight-bold text-primary">Bar Chart</h6>-->
-<!--                                </div>-->
-<!--                                <div class="card-body">-->
-<!--                                    <div class="chart-bar">-->
-<!--                                        <canvas id="myBarChart"></canvas>-->
-<!--                                    </div>-->
-<!--                                    <hr>-->
-<!--                                    Styling for the bar chart can be found in the-->
-<!--                                    <code>/js/demo/chart-bar-demo.js</code> file.-->
-<!--                                </div>-->
-<!--                            </div>-->
-
                         </div>
 
-<!--                        &lt;!&ndash; Donut Chart &ndash;&gt;-->
-<!--                        <div class="col-xl-4 col-lg-5">-->
-<!--                            <div class="card shadow mb-4">-->
-<!--                                &lt;!&ndash; Card Header - Dropdown &ndash;&gt;-->
-<!--                                <div class="card-header py-3">-->
-<!--                                    <h6 class="m-0 font-weight-bold text-primary">Donut Chart</h6>-->
-<!--                                </div>-->
-<!--                                &lt;!&ndash; Card Body &ndash;&gt;-->
-<!--                                <div class="card-body">-->
-<!--                                    <div class="chart-pie pt-4">-->
-<!--                                        <canvas id="myPieChart"></canvas>-->
-<!--                                    </div>-->
-<!--                                    <hr>-->
-<!--                                    Styling for the donut chart can be found in the-->
-<!--                                    <code>/js/demo/chart-pie-demo.js</code> file.-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
 
                 </div>
                 <!-- /.container-fluid -->

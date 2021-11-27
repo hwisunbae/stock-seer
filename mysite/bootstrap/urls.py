@@ -28,7 +28,7 @@ urlpatterns = [
     path('generate_tweet_report/', views.generate_tweet_report),
     path('visualize_finance_report/', views.visualize_finance_report, name='visualize_finance_report'),
     path('visualize_tweet_report/', views.visualize_tweet_report, name='visualize_tweet_report'),
-    path('word_cloud/', views.word_cloud, name='word_cloud'),
+    path('fetch_word_cloud/', views.fetch_word_cloud, name='fetch_word_cloud'),
     path('fetch_tweet/', views.fetch_tweet),
 
     path('', views.index),

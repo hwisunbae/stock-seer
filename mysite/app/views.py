@@ -54,20 +54,6 @@ def html(request, filename, *args):
                                                email=request.POST.get('email'),
                                                password=request.POST.get('password'))
             userObj.save()
-    # if filename in ["tables"]:
-        # try:
-        #     # print(args[0])
-        #     objs = Tweets.objects.filter(created_at__range=[args[0], args[1]])
-        #     # objs = Tweets.objects.filter(created_at__range=['2021-05-04', '2021-05-05'])
-        #
-        #     context["positive_tweets"] = objs.all().order_by('-polarity')[0:100]
-        #     context["negative_tweets"] = objs.all().order_by('polarity')[0:100]
-        #     context["neutral_tweets"] = objs.all().filter(analysis=0)[0:100]
-        # except IndexError:
-        #     print('When page loading first time, selected date is not selected.')
-        # # return render(request, f"{filename}.html", context=context)
-        # return HttpResponse(data, content_type="application/json")
-
     if filename in ["404", "blank"]:
         context["collapse"] = "pages"
 
@@ -164,11 +150,17 @@ def visualize_tweet_report(request):
     })
 
 
-def word_cloud(request):
-    tweet_df = pd.DataFrame(list(Tweets.objects.all().values()))
-    data = get_idf_value(tweet_df)
+def fetch_word_cloud(request):
+    picked_start = request.GET['picked_start']
+    picked_end = request.GET['picked_end']
+    print(picked_start, picked_end)
+    tweet_df = pd.DataFrame(list(Tweets.objects.filter(created_at__range=[picked_start, picked_end]).values()))
+    data, doc_num, word_count_vector_num = get_idf_value(tweet_df)
+    print(data, doc_num, word_count_vector_num)
     return JsonResponse(data={
         'data': data,
+        'doc_num': doc_num,
+        'word_count_vector_num': word_count_vector_num
     })
 
 
