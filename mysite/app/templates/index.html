@@ -366,7 +366,7 @@
 <script>
 
     $(function() {
-        let myPieChart, myLineChart
+        let myPieChart, myLineChart, myPredictionChart
         let picked_start = "2021-05-01", picked_end = "2021-09-30"
         $('input[name="daterange"]').daterangepicker({
             opens: 'left',
@@ -383,6 +383,43 @@
             picked_start = start.format('YYYY-MM-DD')
             picked_end = end.format('YYYY-MM-DD')
         })
+
+        let line_options = {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            legend: {
+                display: true
+            },
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                titleMarginBottom: 10,
+                titleFontColor: '#6e707e',
+                titleFontSize: 14,
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                intersect: false,
+                mode: 'index',
+                caretPadding: 10,
+                callbacks: {
+                    label: function(tooltipItem, chart) {
+                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                        return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                    }
+                }
+            }
+
+        }
 
 
         $('#fetch-tweets').click(function(e) {
@@ -456,43 +493,63 @@
                                 data: data.stock_data
                             }]
                         },
-                        options: {
-                            maintainAspectRatio: false,
-                            layout: {
-                                padding: {
-                                    left: 10,
-                                    right: 25,
-                                    top: 25,
-                                    bottom: 0
-                                }
-                            },
-                            legend: {
-                                display: true
-                            },
-                            tooltips: {
-                                backgroundColor: "rgb(255,255,255)",
-                                bodyFontColor: "#858796",
-                                titleMarginBottom: 10,
-                                titleFontColor: '#6e707e',
-                                titleFontSize: 14,
-                                borderColor: '#dddfeb',
-                                borderWidth: 1,
-                                xPadding: 15,
-                                yPadding: 15,
-                                displayColors: false,
-                                intersect: false,
-                                mode: 'index',
-                                caretPadding: 10,
-                                callbacks: {
-                                    label: function(tooltipItem, chart) {
-                                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                                        return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
-                                    }
-                                }
-                            }
-
-                        }
+                        options: line_options
                     })
+
+                    let prediction_chart = $("#prediction-chart")[0].getContext("2d");
+                    myPredictionChart = new Chart(prediction_chart, {
+                        type: 'line',
+                        data: {
+                            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                            datasets: [{
+                                label: "Stock A",
+                                fill: false,
+                                lineTension: 0.1,
+                                backgroundColor: "rgba(225,0,0,0.4)",
+                                borderColor: "red", // The main line color
+                                borderCapStyle: 'square',
+                                borderDash: [], // try [5, 15] for instance
+                                borderDashOffset: 0.0,
+                                borderJoinStyle: 'miter',
+                                pointBorderColor: "black",
+                                pointBackgroundColor: "white",
+                                pointBorderWidth: 1,
+                                pointHoverRadius: 8,
+                                pointHoverBackgroundColor: "yellow",
+                                pointHoverBorderColor: "brown",
+                                pointHoverBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHitRadius: 10,
+                                // notice the gap in the data and the spanGaps: true
+                                data: [65, 59, 80, 81, 56, 55, 40, ,60,55,30,78],
+                                spanGaps: true,
+                            }, {
+                                label: "Stock B",
+                                fill: true,
+                                lineTension: 0.1,
+                                backgroundColor: "rgba(167,105,0,0.4)",
+                                borderColor: "rgb(167, 105, 0)",
+                                borderCapStyle: 'butt',
+                                borderDash: [],
+                                borderDashOffset: 0.0,
+                                borderJoinStyle: 'miter',
+                                pointBorderColor: "white",
+                                pointBackgroundColor: "black",
+                                pointBorderWidth: 1,
+                                pointHoverRadius: 8,
+                                pointHoverBackgroundColor: "brown",
+                                pointHoverBorderColor: "yellow",
+                                pointHoverBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHitRadius: 10,
+                                // notice the gap in the data and the spanGaps: false
+                                data: [10, 20, 60, 95, 64, 78, 90,,70,40,70,89],
+                                spanGaps: false,
+                            }]
+                        },
+                        options: line_options
+                    });
+
                 },
                 complete: function () {
                     $('#loader').hide();

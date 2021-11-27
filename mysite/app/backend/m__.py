@@ -62,9 +62,8 @@ def get_data():
     return df
 
 
-def get_feature_x_target_y():
+def get_feature_x_target_y(df):
     """ Predict Closing Prices using a 3 day window of previous closing prices"""
-    df = get_data()
     window_size = 3
 
     feature_col_number1 = 0

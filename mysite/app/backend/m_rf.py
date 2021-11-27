@@ -39,7 +39,7 @@ def get_random_forest():
 
 if __name__ == '__main__':
     df = m__.get_data()
-    X_train, X_test, y_train, y_test = m__.get_feature_x_target_y()
+    X_train, X_test, y_train, y_test = m__.get_feature_x_target_y(df)
 
     """RandomForest Repressor"""
     # Fit the model
