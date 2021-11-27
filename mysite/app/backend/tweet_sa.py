@@ -25,7 +25,7 @@ def get_idf_value(dataset):
     """TF-IDF vectorize"""
     # df = pd.read_csv('./data/sa_tweets.csv')
     doc_tokens = dataset['tokens'].ravel()
-    print(doc_tokens)
+    # print(doc_tokens)
     print(doc_tokens.shape)
 
     # instantiate CountVectorizer and generate word counts
@@ -47,7 +47,7 @@ def get_idf_value(dataset):
     json_out = df_idf.to_json(orient='records')[1:-1].replace('},{', '} {')
 
     # print(json_out)
-    return json_out
+    return json_out, doc_tokens.shape, word_count_vector.shape
 
 
 if __name__ == '__main__':
