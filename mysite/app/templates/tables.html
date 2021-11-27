@@ -26,13 +26,28 @@
             {% include "topbar_part.html" %}
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
+                <div id="loader" style="text-align:center; display:none;"><img src="../static/img/loader.gif" alt="loading"></div>
+                <div id="main-content" class="container-fluid">
 
                     <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">Tweets Table</h1>
                     <p class="mb-4">There are 3 tables provided by each tweet polarity: positive, negative and neutral tables.
-                        Due to high volumes of fetched tweets, each table is designed to display 100 tweets ordered by polarity value.
+                        Due to high volumes of fetched tweets, each table is designed to display maximum 100 tweets ordered by polarity value.
                         When tweet ID is clicked, Twitter will look up the Status ID and automatically redirect you.</p>
+
+                    <div class="row">
+                        <div class="input-group mb-4 col-xl-10">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text" id="btnGroupAddon">Selected Date</div>
+                            </div>
+                            <input type="text" name="daterange" class="form-control" aria-label="Input group example" aria-describedby="btnGroupAddon" />
+                        </div>
+                        <div class="buttons mb-4 col-xl-2">
+                            <button href="#" id="fetch-tweets" class="d-none d-sm-inline-block btn btn-middle btn-primary shadow-sm"><i
+                                    class="fas fa-download fa-sm text-white-50"></i> Fetch Tweets</button>
+                        </div>
+                    </div>
+
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
@@ -51,7 +66,7 @@
                                             <th>Polarity</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="dataTable-positive-tbody">
                                     {% for tweet in positive_tweets %}
                                         <tr>
                                             <td><a href="https://twitter.com/tweet/status/{{ tweet.id }}">{{ tweet.id}}</a></td>
@@ -161,6 +176,124 @@
 
     <!-- Page level custom scripts -->
     <script src="/static/js/demo/datatables-demo.js"></script>
+    <script>
+        // Global variables
+        table_positive = $('#dataTable-positive').DataTable({
+            "scrollY": "200px",
+            "bDestroy": true,
+            columnDefs: [{
+                "defaultContent": "-",
+                "targets": "_all"
+            }],
+            "order": [[ 4, "desc" ]]
+        });
+        table_negative = $('#dataTable-negative').DataTable({
+            "scrollY": "200px",
+            "bDestroy": true,
+            columnDefs: [{
+                "defaultContent": "-",
+                "targets": "_all"
+            }],
+            "order": [[ 4, "asc" ]]
+        });
+        table_neutral = $('#dataTable-neutral').DataTable({
+            "scrollY": "200px",
+            "bDestroy": true,
+            columnDefs: [{
+                "defaultContent": "-",
+                "targets": "_all"
+            }],
+            "order": [[ 4, "desc" ]]
+        });
+        $(function() {
+            let picked_start = "2021-05-01", picked_end = "2021-09-30"
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'left',
+                locale: {
+                    "format": "YYYY/MM/DD",
+                    "separator": " - ",
+                },
+                startDate: "2021/05/01",
+                endDate: "2021/09/30",
+                minDate: "2021/05/01",
+                maxDate: "2021/09/30",
+            }, function (start, end, label) {
+                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                picked_start = start.format('YYYY-MM-DD')
+                picked_end = end.format('YYYY-MM-DD')
+            })
+            $('#fetch-tweets').click(function(e){
+                e.preventDefault();
+                $.ajax({
+                    type: 'GET',
+                    url: '/fetch_tweet',
+                    data: {picked_start, picked_end},
+                    beforeSend: function(){
+                        // alert("System is working on your request..")
+                        $('#loader').show();
+                        $('#main-content').hide();
+                    },
+                    complete: function(){
+                        $('#loader').hide();
+                        $('#main-content').show();
+                        table_positive.draw()
+                        table_negative.draw()
+                        table_neutral.draw()
+                    },
+                    success: function(data) {
+                        let count_pos = 0
+                        let count_neg = 0
+                        let count_neu = 0
+
+                        // console.log(data)
+
+                        table_positive.clear()
+                        table_negative.clear()
+                        table_neutral.clear()
+
+                        $.each(data, function(i, item) {
+                            if (item.fields.polarity > 0 && count_pos < 100) {
+                                table_positive.row.add([
+                                    `<a href="https://twitter.com/tweet/status/${item.fields.id}">${item.fields.id}</a>`,
+                                    item.fields.created_at,
+                                    item.fields.user_name,
+                                    item.fields.text,
+                                    item.fields.polarity
+                                ])
+                                count_pos += 1
+
+                            } else if (item.fields.polarity < 0 && count_neg < 100) {
+                                table_negative.row.add([
+                                    `<a href="https://twitter.com/tweet/status/${item.fields.id}">${item.fields.id}</a>`,
+                                    item.fields.created_at,
+                                    item.fields.user_name,
+                                    item.fields.text,
+                                    item.fields.polarity
+                                ])
+                                count_neg += 1
+                            }
+                            else if (item.fields.polarity == 0 && count_neu < 100){
+                                table_neutral.row.add([
+                                    `<a href="https://twitter.com/tweet/status/${item.fields.id}">${item.fields.id}</a>`,
+                                    item.fields.created_at,
+                                    item.fields.user_name,
+                                    item.fields.text,
+                                    item.fields.polarity
+                                ])
+                                count_neu += 1
+                            }
+                            // console.log(count_pos, count_neg, count_neu)
+
+                        })
+
+                    },
+                    error: function() {
+                        alert('Error');
+                    },
+                })
+            })
+        })
+    </script>
 
 </body>
 
