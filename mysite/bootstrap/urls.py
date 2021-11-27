@@ -24,8 +24,8 @@ urlpatterns = [
     path('<filename>.html', views.html),
 
 
-    path('generate_finance_report/', views.generate_finance_report),
-    path('generate_tweet_report/', views.generate_tweet_report),
+    # path('generate_finance_report/', views.generate_finance_report),
+    # path('generate_tweet_report/', views.generate_tweet_report),
     path('visualize_finance_report/', views.visualize_finance_report, name='visualize_finance_report'),
     path('visualize_tweet_report/', views.visualize_tweet_report, name='visualize_tweet_report'),
     path('fetch_word_cloud/', views.fetch_word_cloud, name='fetch_word_cloud'),
