@@ -182,7 +182,6 @@ def visualize_tweet_report(request):
 
     rf_pred_stock, rf_accuracy = m_rf.get_random_forest(obj_tweet_pol, obj_tweet_vol, obj_stock)
     xgb_pred_stock, xgb_accuracy = m_xgboost.get_xgboost(obj_tweet_pol, obj_tweet_vol, obj_stock)
-
     return JsonResponse(data={
         'ratio_labels': ratio_labels,
         'ratio_data': ratio_data,
