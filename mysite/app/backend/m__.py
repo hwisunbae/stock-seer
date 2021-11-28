@@ -32,32 +32,42 @@ def window_data(df, window, feature_col_number1, feature_col_number2, feature_co
     return np.hstack((X_close, X_polarity, X_volume)), np.array(y).reshape(-1, 1)
 
 
-def get_data():
+def get_data(obj_tweet_pol, obj_tweet_vol, obj_stock):
     """ Data ready for feature engineering """
 
-    df_tweet = pd.read_csv('data/sa_tweets.csv')
-    df_stock = pd.read_csv('data/yfinance/preprocessed_yfinance.csv')
+    # Dev purpose
+    # df_tweet = pd.read_csv('data/sa_tweets.csv')
+    # df_stock = pd.read_csv('data/yfinance/preprocessed_yfinance.csv')
 
-    df_tweet['Date'] = df_tweet['created_at'].apply(lambda x: x[:10])
-    df_pol = df_tweet.groupby('Date').sum()['tb_polarity'].reset_index(name='polarity')
-    vol = df_tweet.groupby('Date').size().reset_index(name='twitter_volume')
-    df_pol = df_pol.merge(vol, how='inner', on='Date')
+    # Concatenate df_pol, df_vol and df_stock
+    df_pol = pd.DataFrame(list(obj_tweet_pol))
+    df_vol = pd.DataFrame(list(obj_tweet_vol))
+    df_pol['date'] = df_pol['date'].astype(str).apply(lambda x: str(x)[:10])
+    df_vol['date'] = df_vol['date'].astype(str).apply(lambda x: str(x)[:10])
+    # print(df_pol)
+    # print(df_vol)
 
-    # normalize polarity value
-    df_pol_max = df_pol['polarity'].max()
-    df_pol_min = df_pol['polarity'].min()
-    df_pol['polarity'] = (df_pol['polarity'] - df_pol_min) / df_pol_max
-
-    # print(df_stock)
-    # print(df_tweet)
+    df_pol = df_pol.merge(df_vol, how='inner', on='date')
     # print(df_pol)
 
-    df = df_pol.merge(df_stock[['Date', 'Adj Close']], how='inner', on='Date')
+    # normalize polarity value
+    df_pol_max = df_pol['total_polarity'].max()
+    df_pol_min = df_pol['total_polarity'].min()
+    df_pol['total_polarity'] = (df_pol['total_polarity'] - df_pol_min) / df_pol_max
+    # print(df_pol)
 
-    df['pct_change'] = df['Adj Close'].pct_change()
-    df.dropna(inplace=True)
-    df.set_index('Date', inplace=True)
+    df_stock = pd.DataFrame(list(obj_stock))
+    df_stock['date'] = df_stock['date'].astype(str)
+    # print(df_stock)
+
+    df = df_pol.merge(df_stock, how='inner', on='date')
     # print(df)
+
+    df['pct_change'] = df['adj_close'].pct_change()
+    df.dropna(inplace=True)
+    df.set_index('date', inplace=True)
+    print('Calling from m__')
+    print(df)
 
     return df
 

@@ -5,13 +5,15 @@ import pandas as pd
 from django.core import serializers
 import json
 
+from django.db.models.functions import TruncMonth, TruncDay, Trunc
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import ObjectDoesNotExist
+from django.db.models import ObjectDoesNotExist, Sum, DateTimeField, Count
 from django.views.decorators.csrf import csrf_exempt
 
+from .backend import m_rf, m_xgboost
 from .backend.tweet_sa import *
 from .models import *
 
@@ -134,6 +136,7 @@ def visualize_tweet_report(request):
     picked_end = request.GET['picked_end']
     print(picked_start, picked_end)
 
+    # -------------------------------
     # Polarity Ratio
     ratio_labels = ['1', '0', '-1']
     ratio_data = [0, 0, 0]
@@ -148,6 +151,7 @@ def visualize_tweet_report(request):
             ratio_data[1] = ratio_data[1] + 1
     print(ratio_labels, ratio_data)
 
+    # -------------------------------
     # Stock Index
     stock_labels = []
     stock_data = []
@@ -157,11 +161,37 @@ def visualize_tweet_report(request):
         stock_labels.append(entry.date)
         stock_data.append(entry.adj_close)
 
+    # -------------------------------
+    # Stock Prediction
+
+    # polarity score each day
+    obj_tweet_pol = Tweets.objects.filter(created_at__range=[picked_start, picked_end]) \
+        .annotate(date=Trunc('created_at', 'day', output_field=DateTimeField())) \
+        .values('date') \
+        .annotate(total_polarity=Sum('polarity')) \
+        .order_by('date')
+
+    # twitter volume each day
+    obj_tweet_vol = Tweets.objects.filter(created_at__range=[picked_start, picked_end]) \
+        .annotate(date=Trunc('created_at', 'day', output_field=DateTimeField())) \
+        .values('date') \
+        .annotate(total_tweets=Count('text')) \
+        .order_by('date')
+
+    obj_stock = Stock.objects.values('date', 'adj_close')
+
+    rf_pred_stock, rf_accuracy = m_rf.get_random_forest(obj_tweet_pol, obj_tweet_vol, obj_stock)
+    xgb_pred_stock, xgb_accuracy = m_xgboost.get_xgboost(obj_tweet_pol, obj_tweet_vol, obj_stock)
     return JsonResponse(data={
         'ratio_labels': ratio_labels,
         'ratio_data': ratio_data,
         'stock_labels': stock_labels,
         'stock_data': stock_data,
+        'rf_real': rf_pred_stock['Real'].to_json(),
+        'rf_pred': rf_pred_stock['Predicted'].to_json(),
+        'xgb_pred': xgb_pred_stock['Predicted'].to_json(),
+        'rf_accuracy': rf_accuracy,
+        'xgb_accuracy': xgb_accuracy
     })
 
 
