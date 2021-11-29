@@ -35,8 +35,7 @@ certifi==2020.12.5
 cffi 
 chardet 
 click 
-cloudpickle 
-clyent==1.2.2
+cloudpickle
 colorama 
 conda==4.10.3
 conda-build==3.21.4
