@@ -36,14 +36,7 @@ cffi
 chardet 
 click 
 cloudpickle
-colorama 
-conda==4.10.3
-conda-build==3.21.4
-conda-content-trust 
-conda-package-handling
-conda-repo-cli 
-conda-token 
-conda-verify==3.4.2
+colorama
 contextlib2==0.6.0.post1
 cryptography
 cycler==0.10.0
