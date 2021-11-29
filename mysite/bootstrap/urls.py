@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from bootstrap import settings
 from django.conf.urls.static import static
 from app import views
@@ -28,6 +28,7 @@ urlpatterns = [
     path('fetch_word_cloud/', views.fetch_word_cloud, name='fetch_word_cloud'),
     path('fetch_tweet/', views.fetch_tweet),
 
+    path('accounts/', include('allauth.urls')),
     path('', views.index),
 
 
