@@ -4,7 +4,8 @@
 <head>
 
     {% include "head_part.html" %}
-
+    <!-- Custom styles for this page -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 </head>
 
@@ -45,22 +46,14 @@
                             <input type="text" name="daterange" class="form-control" aria-label="Input group example" aria-describedby="btnGroupAddon" />
                         </div>
                         <div class="buttons mb-4 col-xl-2">
-                            <button href="#" id="generate-reports" class="d-none d-sm-inline-block btn btn-middle btn-primary shadow-sm"><i
-                                    class="fas fa-download fa-sm text-white-50"></i> Generate Files</button>
-                        </div>
-                        <div class="buttons mb-4 col-xl-2">
                             <button href="#" id="fetch-tweets" class="d-none d-sm-inline-block btn btn-middle btn-primary shadow-sm"><i
                                     class="fas fa-download fa-sm text-white-50"></i> Fetch Tweets</button>
                         </div>
+                        <div class="buttons mb-4 col-xl-2">
+                            <button href="#" id="generate-reports" class="d-none d-sm-inline-block btn btn-middle btn-primary shadow-sm"><i
+                                    class="fas fa-download fa-sm text-white-50"></i> Download Tweet CSV</button>
+                        </div>
                     </div>
-                    <!--                    <button href="#" disabled="disabled" id="generate-finance-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i-->
-                    <!--                            class="fas fa-download fa-sm text-white-50"></i> Generate Finance Report</button>-->
-                    <!--                    <button href="#" disabled="disabled" id="generate-tweet-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i-->
-                    <!--                            class="fas fa-download fa-sm text-white-50"></i> Generate Tweet Report</button>-->
-                    <!--                    <button href="#" id="visualize-finance-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">-->
-                    <!--                            <i class="fas fa-chart-bar"></i> Visualize Finance Report</button>-->
-                    <!--                    <button href="#" id="visualize-tweet-report" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">-->
-                    <!--                            <i class="fas fa-chart-pie"></i> Visualize Tweet Report</button>-->
                 </div>
 
 
@@ -92,7 +85,7 @@
                             <!-- Card Body -->
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <canvas id="finance-chart" data-url="{% url 'visualize_finance_report' %}"></canvas>
+                                    <canvas id="finance-chart" ></canvas>
                                 </div>
                             </div>
                         </div>
@@ -157,7 +150,8 @@
                                     <canvas id="prediction-chart" ></canvas>
                                 </div>
                                 <hr>
-                                <div id="description">Train set is pre-defined 20% of the date that user selects, which means machine learning model predicts stock price for only 20% of the date that user defines.</div>
+                                <div id="description">Train set is pre-defined 20% of the date that user selects, which means machine learning model predicts stock price for only 20% of the date that user defines.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -198,32 +192,31 @@
                 <div class="row">
 
                     <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                            Earnings (Monthly)</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Earnings From Random Forest</div>
+                                        <div id="rf-profit" class="h5 mb-0 font-weight-bold text-gray-800">$0</div>
                                     </div>
                                     <div class="col-auto">
-                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                        <i class="fas fa-tree fa-2x text-gray-300"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-success shadow h-100 py-2">
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                            Earnings (Annual)</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Earnings From XGBoost</div>
+                                        <div id="xgb-profit" class="h5 mb-0 font-weight-bold text-gray-800">$0</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -232,94 +225,60 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-info shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
-                                        </div>
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col-auto">
-                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
-                                            </div>
-                                            <div class="col">
-                                                <div class="progress progress-sm mr-2">
-                                                    <div class="progress-bar bg-info" role="progressbar"
-                                                         style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-                                                         aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pending Requests Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-warning shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                            Pending Requests</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-comments fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
 
                 <!-- Content Row -->
                 <div class="row">
 
                     <div class="col-lg-6 mb-4">
 
-                        <!-- Illustrations -->
+                        <!-- DataTales Example -->
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Illustrations</h6>
+                                <h6 class="m-0 font-weight-bold text-info">Portfolio From Random Forest</h6>
                             </div>
                             <div class="card-body">
-                                <div class="text-center">
-                                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
-                                         src="/static/img/undraw_posting_photo.svg" alt="">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable-rf" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Decision</th>
+                                                <th>Price</th>
+                                                <th>Accumulative Profit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataTable-rf-tbody">
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <p>Add some quality, svg illustrations to your project courtesy of <a
-                                        target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a
-                                    constantly updated collection of beautiful svg images that you can use
-                                    completely free and without attribution!</p>
-                                <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse Illustrations on
-                                    unDraw &rarr;</a>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
 
-                        <!-- Approach -->
+                        <!-- DataTales Example -->
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Development Approach</h6>
+                                <h6 class="m-0 font-weight-bold text-warning">Portfolio From XGBoost</h6>
                             </div>
                             <div class="card-body">
-                                <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classes in order to reduce
-                                    CSS bloat and poor page performance. Custom CSS classes are used to create
-                                    custom components and custom utility classes.</p>
-                                <p class="mb-0">Before working with this theme, you should become familiar with the
-                                    Bootstrap framework, especially the utility classes.</p>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable-xgb" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Decision</th>
+                                                <th>Price</th>
+                                                <th>Accumulative Profit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataTable-xgb-tbody">
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -346,6 +305,9 @@
 {% include "modals_and_scripts_part.html" %}
 
 <!-- Page level plugins -->
+<script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<!-- Page level plugins -->
 <script src="/static/vendor/chart.js/Chart.min.js"></script>
 
 <!-- Page level custom scripts -->
@@ -353,6 +315,24 @@
 
 
 <script>
+    // Global variables
+    table_xgb = $('#dataTable-xgb').DataTable({
+        "scrollY": "200px",
+        "bDestroy": true,
+        columnDefs: [{
+            "defaultContent": "-",
+            "targets": "_all"
+        }],
+    })
+
+    table_rf = $('#dataTable-rf').DataTable({
+        "scrollY": "200px",
+        "bDestroy": true,
+        columnDefs: [{
+            "defaultContent": "-",
+            "targets": "_all"
+        }],
+    })
 
     $(function() {
         let myPieChart, myLineChart, myPredictionChart
@@ -378,14 +358,39 @@
                 diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             // console.log(diffDays)
 
-            if(diffDays < 7) {
+            if(diffDays < 10) {
                 $('#fetch-tweets').prop("disabled", true);
-                alert("Please select at least a week to train model for predictive stock price.");
+                alert("Please drag at least 10 days to train model for predictive stock price.");
             }
             else {
                 $('#fetch-tweets').prop("disabled", false);
-                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                // alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
             }
+        })
+
+        $('#generate-reports').click(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/generate_reports',
+                data: {picked_start, picked_end},
+                beforeSend: function(){
+                    $('#loader').show();
+                    $('#main-content').hide();
+                },
+                complete: function(){
+                    $('#loader').hide();
+                    $('#main-content').show();
+                },
+                success: function(data) {
+                    // console.log(data)
+                    var blob=new Blob([data]);
+                    var link=document.createElement('a');
+                    link.href=window.URL.createObjectURL(blob);
+                    link.download="tweets.csv";
+                    link.click();
+                }
+            })
         })
 
         let line_options = {
@@ -446,6 +451,41 @@
 
                 },
                 success: function (data) {
+                    // ------------------------------
+                    // Table
+                    // ------------------------------
+                    table_xgb.clear()
+                    table_rf.clear()
+                    let xgb_objs = JSON.parse(data.xgb_objs),
+                        rf_objs = JSON.parse(data.rf_objs)
+                    $.each(xgb_objs, function(i, item){
+                        table_xgb.row.add([
+                            String(item.fields.date).substring(0, 10),
+                            (String(item.fields.decision)=='Decision.B') ? 'Buy': 'Sell',
+                            '$'+item.fields.price,
+                            '$'+item.fields.profit
+                        ])
+
+                        if (i == xgb_objs.length - 1)
+                            $('#xgb-profit').text('$'+item.fields.profit)
+                    })
+
+                    $.each(rf_objs, function(i, item){
+                        table_rf.row.add([
+                            String(item.fields.date).substring(0, 10),
+                            (String(item.fields.decision)=='Decision.B') ? 'Buy': 'Sell',
+                            '$'+item.fields.price,
+                            '$'+item.fields.profit
+                        ])
+
+                        if (i == rf_objs.length - 1)
+                            $('#rf-profit').text('$'+item.fields.profit)
+                    })
+
+
+                    // ------------------------------
+                    // Chart
+                    // ------------------------------
                     var circle_chart = document.getElementById("tweet-circle-chart");
                     myPieChart = new Chart(circle_chart, {
                         type: 'doughnut',
@@ -590,6 +630,8 @@
                 complete: function (data) {
                     $('#loader').hide();
                     $('#main-content').show();
+                    table_xgb.draw()
+                    table_rf.draw()
                     console.log('complete')
                     const rf = (data.responseJSON.rf_accuracy * 100).toFixed(2),
                         xbf = (data.responseJSON.xgb_accuracy * 100).toFixed(2),
@@ -618,27 +660,7 @@
                     console.log(typeof(myLineChart))
                 },
             })
-
         })
-
-        // $('#generate-finance-report').click(function(e) {
-        //     e.preventDefault();
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: '/generate_finance_report',
-        //         beforeSend: function(){
-        //             $('#loader').show();
-        //         },
-        //         complete: function(){
-        //             $('#loader').hide();
-        //         },
-        //         success: function(result) {
-        //             alert('Stock objects are created from yfinance API')
-        //         }
-        //     })
-        // })
-
-
     });
 
 

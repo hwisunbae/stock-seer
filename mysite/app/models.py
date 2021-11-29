@@ -1,3 +1,5 @@
+from enum import Enum
+
 from django.db import models
 
 
@@ -27,3 +29,31 @@ class Tweets(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class MLMethod(Enum):
+    RF = 'RandomForest'
+    XG = 'XGBoost'
+
+
+class Decision(Enum):
+    B = 'Buy'
+    S = 'Sell'
+
+
+class Portfolio(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    ml_method = models.CharField(
+        max_length=20,
+        choices=[(tag, tag.value) for tag in MLMethod]
+    )
+
+    decision = models.CharField(
+        max_length=20,
+        choices=[(tag, tag.value) for tag in Decision]
+    )
+
+    date = models.DateTimeField()
+    price = models.DecimalField(max_digits=20, decimal_places=3)
+    profit = models.DecimalField(max_digits=20, decimal_places=3)
