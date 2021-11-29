@@ -156,11 +156,11 @@ def visualize_tweet_report(request):
     # -------------------------------
     # Stock Portfolio
     Portfolio.objects.all().delete()
-
     portfolio_cal(rf_pred_stock, MLMethod.RF)
+    portfolio_cal(xgb_pred_stock, MLMethod.XG)
 
-
-    print(Portfolio.objects.all())
+    xgb_objs = serializers.serialize('json', Portfolio.objects.filter(ml_method=MLMethod.XG))
+    rf_objs = serializers.serialize('json', Portfolio.objects.filter(ml_method=MLMethod.RF))
 
     return JsonResponse(data={
         'ratio_labels': ratio_labels,
@@ -171,7 +171,9 @@ def visualize_tweet_report(request):
         'rf_pred': rf_pred,
         'xgb_pred': xgb_pred,
         'rf_accuracy': rf_accuracy,
-        'xgb_accuracy': xgb_accuracy
+        'xgb_accuracy': xgb_accuracy,
+        'xgb_objs': xgb_objs,
+        'rf_objs': rf_objs
     })
 
 
@@ -187,26 +189,26 @@ def portfolio_cal(pred_stock, ml_method):
     for i in range(len(pred_stock)):
         pred = pred_stock.iloc[i]['Predicted']
         real = pred_stock.iloc[i]['Real']
-        print('----------------------------')
-        print('i', i)
-        print('pred', pred)
-        print('real', real)
-        print('pred_mean', pred_mean)
+        # print('----------------------------')
+        # print('i', i)
+        # print('pred', pred)
+        # print('real', real)
+        # print('pred_mean', pred_mean)
 
         # BUY decision (pred < mean)
         if (pred < pred_mean) and (portfolio_limit == 0):
             portfolio_limit = 1
             profit = 0
-            print('----------------------------')
-            print('BUY')
-            print('date', pred_stock.iloc[i]['date'])
-            print('decision', 'buy')
-            print('price', pred_stock.iloc[i]['Real'])
-            print('bought', pred_stock.iloc[i]['Real'])
-            print('profit', profit)
+            # print('----------------------------')
+            # print('BUY')
+            # print('date', pred_stock.iloc[i]['date'])
+            # print('decision', 'buy')
+            # print('price', pred_stock.iloc[i]['Real'])
+            # print('bought', pred_stock.iloc[i]['Real'])
+            # print('profit', profit)
 
-            if Portfolio.objects.filter(decision=Decision.S).exists():
-                profit = Portfolio.objects.latest('profit').profit
+            if Portfolio.objects.filter(ml_method=ml_method, decision=Decision.S).exists():
+                profit = Portfolio.objects.filter(ml_method=ml_method, decision=Decision.S).latest('profit').profit
 
             portfolio_bought = Portfolio.objects.create(date=pred_stock.iloc[i]['date'],
                                                         ml_method=ml_method,
@@ -217,35 +219,38 @@ def portfolio_cal(pred_stock, ml_method):
 
         # SELL decision (pred > actual bought value at buy time)
         bought = 0
-        if Portfolio.objects.filter(decision=Decision.B).exists():
-            bought = Portfolio.objects.filter(decision=Decision.B).latest('date').price
+        if Portfolio.objects.filter(ml_method=ml_method, decision=Decision.B).exists():
+            bought = Portfolio.objects.filter(ml_method=ml_method, decision=Decision.B).latest('date').price
 
         if (pred > bought) and (bought != 0) and (portfolio_limit == 1):
             portfolio_limit = 0
             sold = pred_stock.iloc[i]['Real']
-            print('----------------------------')
-            print('SELL at', pred_stock.iloc[i]['Real'])
-            print('date', pred_stock.iloc[i]['date'])
-            print('decision', 'sell')
-            print('price (sold)', sold)
-            print('bought', bought)
-            print('profit', sold - bought)
+            # print('----------------------------')
+            # print('SELL at', pred_stock.iloc[i]['Real'])
+            # print('date', pred_stock.iloc[i]['date'])
+            # print('decision', 'sell')
+            # print('price (sold)', sold)
+            # print('bought', bought)
+            # print('profit', sold - bought)
 
             portfolio_sold = Portfolio.objects.create(date=pred_stock.iloc[i]['date'],
                                                       ml_method=ml_method,
                                                       decision=Decision.S,
                                                       price=sold,
-                                                      profit=Portfolio.objects.latest('profit').profit + sold - bought)
+                                                      profit=Portfolio.objects
+                                                      .filter(ml_method=ml_method)
+                                                      .latest('profit')
+                                                      .profit + (sold - bought))
             portfolio_sold.save()
 
 
 def fetch_word_cloud(request):
     picked_start = request.GET['picked_start']
     picked_end = request.GET['picked_end']
-    print(picked_start, picked_end)
+    # print(picked_start, picked_end)
     tweet_df = pd.DataFrame(list(Tweets.objects.filter(created_at__range=[picked_start, picked_end]).values()))
     data, doc_num, word_count_vector_num = get_idf_value(tweet_df)
-    print(data, doc_num, word_count_vector_num)
+    # print(data, doc_num, word_count_vector_num)
     return JsonResponse(data={
         'data': data,
         'doc_num': doc_num,
@@ -257,10 +262,15 @@ def fetch_tweet(request):
     picked_start = request.GET['picked_start']
     picked_end = request.GET['picked_end']
 
-    objs = Tweets.objects.filter(created_at__range=[picked_start, picked_end])
-    all_tweets = objs.all()
+    pos = Tweets.objects.filter(created_at__range=[picked_start, picked_end], analysis=1).order_by('-polarity')
+    neg = Tweets.objects.filter(created_at__range=[picked_start, picked_end], analysis=-1).order_by('polarity')
+    neu = Tweets.objects.filter(created_at__range=[picked_start, picked_end], analysis=0).order_by('-subjectivity')
+    pos_tweets = serializers.serialize('json', pos)
+    neg_tweets = serializers.serialize('json', neg)
+    neu_tweets = serializers.serialize('json', neu)
 
-    data = serializers.serialize('json', all_tweets)
-    # print(data)
-
-    return HttpResponse(data, content_type="application/json")
+    return JsonResponse(data={
+        'pos_tweets': pos_tweets,
+        'neg_tweets': neg_tweets,
+        'neu_tweets': neu_tweets
+    })

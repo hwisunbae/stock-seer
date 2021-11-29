@@ -4,7 +4,8 @@
 <head>
 
     {% include "head_part.html" %}
-
+    <!-- Custom styles for this page -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 </head>
 
@@ -149,7 +150,8 @@
                                     <canvas id="prediction-chart" ></canvas>
                                 </div>
                                 <hr>
-                                <div id="description">Train set is pre-defined 20% of the date that user selects, which means machine learning model predicts stock price for only 20% of the date that user defines.</div>
+                                <div id="description">Train set is pre-defined 20% of the date that user selects, which means machine learning model predicts stock price for only 20% of the date that user defines.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -197,10 +199,10 @@
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                             Earnings From Random Forest</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                        <div id="rf-profit" class="h5 mb-0 font-weight-bold text-gray-800">$0</div>
                                     </div>
                                     <div class="col-auto">
-                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                        <i class="fas fa-tree fa-2x text-gray-300"></i>
                                     </div>
                                 </div>
                             </div>
@@ -214,7 +216,7 @@
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                             Earnings From XGBoost</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                        <div id="xgb-profit" class="h5 mb-0 font-weight-bold text-gray-800">$0</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -240,7 +242,6 @@
                                     <table class="table table-bordered" id="dataTable-rf" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
                                                 <th>Date</th>
                                                 <th>Decision</th>
                                                 <th>Price</th>
@@ -248,15 +249,6 @@
                                             </tr>
                                         </thead>
                                         <tbody id="dataTable-rf-tbody">
-                                        {% for tweet in positive_tweets %}
-                                            <tr>
-                                                <td>{{ tweet.created_at }}</td>
-                                                <td>{{ tweet.user_name }}</td>
-                                                <td>{{ tweet.text }}</td>
-                                                <td>{{ tweet.polarity }}</td>
-                                            </tr>
-                                        {% endfor %}
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -275,7 +267,6 @@
                                     <table class="table table-bordered" id="dataTable-xgb" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
                                                 <th>Date</th>
                                                 <th>Decision</th>
                                                 <th>Price</th>
@@ -283,16 +274,6 @@
                                             </tr>
                                         </thead>
                                         <tbody id="dataTable-xgb-tbody">
-                                        {% for tweet in positive_tweets %}
-                                            <tr>
-                                                <td><a href="https://twitter.com/tweet/status/{{ tweet.id }}">{{ tweet.id}}</a></td>
-                                                <td>{{ tweet.created_at }}</td>
-                                                <td>{{ tweet.user_name }}</td>
-                                                <td>{{ tweet.text }}</td>
-                                                <td>{{ tweet.polarity }}</td>
-                                            </tr>
-                                        {% endfor %}
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -324,6 +305,9 @@
 {% include "modals_and_scripts_part.html" %}
 
 <!-- Page level plugins -->
+<script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<!-- Page level plugins -->
 <script src="/static/vendor/chart.js/Chart.min.js"></script>
 
 <!-- Page level custom scripts -->
@@ -331,6 +315,24 @@
 
 
 <script>
+    // Global variables
+    table_xgb = $('#dataTable-xgb').DataTable({
+        "scrollY": "200px",
+        "bDestroy": true,
+        columnDefs: [{
+            "defaultContent": "-",
+            "targets": "_all"
+        }],
+    })
+
+    table_rf = $('#dataTable-rf').DataTable({
+        "scrollY": "200px",
+        "bDestroy": true,
+        columnDefs: [{
+            "defaultContent": "-",
+            "targets": "_all"
+        }],
+    })
 
     $(function() {
         let myPieChart, myLineChart, myPredictionChart
@@ -362,7 +364,7 @@
             }
             else {
                 $('#fetch-tweets').prop("disabled", false);
-                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                // alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
             }
         })
 
@@ -449,6 +451,41 @@
 
                 },
                 success: function (data) {
+                    // ------------------------------
+                    // Table
+                    // ------------------------------
+                    table_xgb.clear()
+                    table_rf.clear()
+                    let xgb_objs = JSON.parse(data.xgb_objs),
+                        rf_objs = JSON.parse(data.rf_objs)
+                    $.each(xgb_objs, function(i, item){
+                        table_xgb.row.add([
+                            String(item.fields.date).substring(0, 10),
+                            (String(item.fields.decision)=='Decision.B') ? 'Buy': 'Sell',
+                            '$'+item.fields.price,
+                            '$'+item.fields.profit
+                        ])
+
+                        if (i == xgb_objs.length - 1)
+                            $('#xgb-profit').text('$'+item.fields.profit)
+                    })
+
+                    $.each(rf_objs, function(i, item){
+                        table_rf.row.add([
+                            String(item.fields.date).substring(0, 10),
+                            (String(item.fields.decision)=='Decision.B') ? 'Buy': 'Sell',
+                            '$'+item.fields.price,
+                            '$'+item.fields.profit
+                        ])
+
+                        if (i == rf_objs.length - 1)
+                            $('#rf-profit').text('$'+item.fields.profit)
+                    })
+
+
+                    // ------------------------------
+                    // Chart
+                    // ------------------------------
                     var circle_chart = document.getElementById("tweet-circle-chart");
                     myPieChart = new Chart(circle_chart, {
                         type: 'doughnut',
@@ -593,6 +630,8 @@
                 complete: function (data) {
                     $('#loader').hide();
                     $('#main-content').show();
+                    table_xgb.draw()
+                    table_rf.draw()
                     console.log('complete')
                     const rf = (data.responseJSON.rf_accuracy * 100).toFixed(2),
                         xbf = (data.responseJSON.xgb_accuracy * 100).toFixed(2),
