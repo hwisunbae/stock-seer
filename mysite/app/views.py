@@ -31,6 +31,7 @@ def html(request, filename, *args):
     if filename == "login" and request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
+
         try:
             if "@" in username:
                 user = User.objects.get(email=username)
