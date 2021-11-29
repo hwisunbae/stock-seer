@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+
 import pandas as pd
 from django.core import serializers
 import json
@@ -30,6 +31,7 @@ def html(request, filename, *args):
     if filename == "login" and request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
+
         try:
             if "@" in username:
                 user = User.objects.get(email=username)
@@ -68,67 +70,32 @@ def index(request):
     return html(request, "index")
 
 
-# def generate_finance_report(request):
-#     if request.GET:
-#         pass
-#     else:
-#         dirname = os.path.dirname
-#         # Creating stock obj
-#         path = os.path.join(dirname(dirname(__file__)), 'backend', 'data', 'yfinance', 'preprocessed_yfinance.csv')
-#         with open(path) as f:
-#             reader = csv.reader(f)
-#             next(reader)
-#             for row in reader:
-#                 obj, created = Stock.objects.get_or_create(
-#                     date=row[0],
-#                     adj_close=row[1],
-#                     close=row[2],
-#                     volume=row[3]
-#                 )
-#                 obj.save()
-#         print(Stock.objects.all())
-#         return HttpResponse('successfully generated report')
-#
-#
-# def generate_tweet_report(request):
-#     if request.GET:
-#         pass
-#     else:
-#         dirname = os.path.dirname
-#         # Creating tweet obj
-#         path = os.path.join(dirname(dirname(__file__)), 'backend', 'data', 'sa_tweets.csv')
-#         with open(path) as f:
-#             reader = csv.reader(f)
-#             next(reader)
-#             for row in reader:
-#                 obj, created = Tweets.objects.get_or_create(
-#                     tweet_id=row[0],
-#                     created_at=row[1],
-#                     user_name=row[2],
-#                     text=row[3],
-#                     lang=row[4],
-#                     tokens=row[5],
-#                     subjectivity=row[6],
-#                     polarity=row[7],
-#                     analysis=row[8]
-#                 )
-#                 obj.save()
-#         print(Tweets.objects.all())
-#         return HttpResponse('successfully generated report')
+def generate_reports(request):
+    picked_start = request.GET['picked_start']
+    picked_end = request.GET['picked_end']
+    print(picked_start, picked_end)
 
-def visualize_finance_report(request):
-    labels = []
-    data = []
+    # Create the HttpResponse object with the appropriate CSV header.
+    tweet_res = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="tweets.csv"'},
+    )
 
-    queryset = Stock.objects.all().order_by('date')
+    queryset = Tweets.objects.all().filter(created_at__range=[picked_start, picked_end])
+    writer = csv.writer(tweet_res)
+    writer.writerows([['id', 'created_at', 'user_name',
+                       'text', 'subjectivity', 'polarity']])
     for entry in queryset:
-        labels.append(entry.date)
-        data.append(entry.adj_close)
+        writer.writerows([[
+            str(entry.id),
+            str(entry.created_at),
+            entry.user_name,
+            entry.text,
+            str(entry.subjectivity),
+            str(entry.polarity)
+        ]])
 
-    return JsonResponse(data={
-        'labels': labels,
-        'data': data,
-    })
+    return tweet_res
 
 
 def visualize_tweet_report(request):
@@ -182,26 +149,109 @@ def visualize_tweet_report(request):
 
     rf_pred_stock, rf_accuracy = m_rf.get_random_forest(obj_tweet_pol, obj_tweet_vol, obj_stock)
     xgb_pred_stock, xgb_accuracy = m_xgboost.get_xgboost(obj_tweet_pol, obj_tweet_vol, obj_stock)
+
+    rf_real = rf_pred_stock['Real'].to_json(),
+    rf_pred = rf_pred_stock['Predicted'].to_json(),
+    xgb_pred = xgb_pred_stock['Predicted'].to_json()
+
+    # -------------------------------
+    # Stock Portfolio
+    Portfolio.objects.all().delete()
+    portfolio_cal(rf_pred_stock, MLMethod.RF)
+    portfolio_cal(xgb_pred_stock, MLMethod.XG)
+
+    xgb_objs = serializers.serialize('json', Portfolio.objects.filter(ml_method=MLMethod.XG))
+    rf_objs = serializers.serialize('json', Portfolio.objects.filter(ml_method=MLMethod.RF))
+
     return JsonResponse(data={
         'ratio_labels': ratio_labels,
         'ratio_data': ratio_data,
         'stock_labels': stock_labels,
         'stock_data': stock_data,
-        'rf_real': rf_pred_stock['Real'].to_json(),
-        'rf_pred': rf_pred_stock['Predicted'].to_json(),
-        'xgb_pred': xgb_pred_stock['Predicted'].to_json(),
+        'rf_real': rf_real,
+        'rf_pred': rf_pred,
+        'xgb_pred': xgb_pred,
         'rf_accuracy': rf_accuracy,
-        'xgb_accuracy': xgb_accuracy
+        'xgb_accuracy': xgb_accuracy,
+        'xgb_objs': xgb_objs,
+        'rf_objs': rf_objs
     })
+
+
+def portfolio_cal(pred_stock, ml_method):
+    pred_stock.reset_index(level=0, inplace=True)
+    print(pred_stock)
+    # print(rf_pred_stock[['date', 'Predicted']])
+    pred_mean = pred_stock['Predicted'].mean()
+
+    # portfolio can only hold one stock at a time
+    portfolio_limit = 0
+
+    for i in range(len(pred_stock)):
+        pred = pred_stock.iloc[i]['Predicted']
+        real = pred_stock.iloc[i]['Real']
+        # print('----------------------------')
+        # print('i', i)
+        # print('pred', pred)
+        # print('real', real)
+        # print('pred_mean', pred_mean)
+
+        # BUY decision (pred < mean)
+        if (pred < pred_mean) and (portfolio_limit == 0):
+            portfolio_limit = 1
+            profit = 0
+            # print('----------------------------')
+            # print('BUY')
+            # print('date', pred_stock.iloc[i]['date'])
+            # print('decision', 'buy')
+            # print('price', pred_stock.iloc[i]['Real'])
+            # print('bought', pred_stock.iloc[i]['Real'])
+            # print('profit', profit)
+
+            if Portfolio.objects.filter(ml_method=ml_method, decision=Decision.S).exists():
+                profit = Portfolio.objects.filter(ml_method=ml_method, decision=Decision.S).latest('profit').profit
+
+            portfolio_bought = Portfolio.objects.create(date=pred_stock.iloc[i]['date'],
+                                                        ml_method=ml_method,
+                                                        decision=Decision.B,
+                                                        price=pred_stock.iloc[i]['Real'],
+                                                        profit=profit)
+            portfolio_bought.save()
+
+        # SELL decision (pred > actual bought value at buy time)
+        bought = 0
+        if Portfolio.objects.filter(ml_method=ml_method, decision=Decision.B).exists():
+            bought = Portfolio.objects.filter(ml_method=ml_method, decision=Decision.B).latest('date').price
+
+        if (pred > bought) and (bought != 0) and (portfolio_limit == 1):
+            portfolio_limit = 0
+            sold = pred_stock.iloc[i]['Real']
+            # print('----------------------------')
+            # print('SELL at', pred_stock.iloc[i]['Real'])
+            # print('date', pred_stock.iloc[i]['date'])
+            # print('decision', 'sell')
+            # print('price (sold)', sold)
+            # print('bought', bought)
+            # print('profit', sold - bought)
+
+            portfolio_sold = Portfolio.objects.create(date=pred_stock.iloc[i]['date'],
+                                                      ml_method=ml_method,
+                                                      decision=Decision.S,
+                                                      price=sold,
+                                                      profit=Portfolio.objects
+                                                      .filter(ml_method=ml_method)
+                                                      .latest('profit')
+                                                      .profit + (sold - bought))
+            portfolio_sold.save()
 
 
 def fetch_word_cloud(request):
     picked_start = request.GET['picked_start']
     picked_end = request.GET['picked_end']
-    print(picked_start, picked_end)
+    # print(picked_start, picked_end)
     tweet_df = pd.DataFrame(list(Tweets.objects.filter(created_at__range=[picked_start, picked_end]).values()))
     data, doc_num, word_count_vector_num = get_idf_value(tweet_df)
-    print(data, doc_num, word_count_vector_num)
+    # print(data, doc_num, word_count_vector_num)
     return JsonResponse(data={
         'data': data,
         'doc_num': doc_num,
@@ -213,10 +263,15 @@ def fetch_tweet(request):
     picked_start = request.GET['picked_start']
     picked_end = request.GET['picked_end']
 
-    objs = Tweets.objects.filter(created_at__range=[picked_start, picked_end])
-    all_tweets = objs.all()
+    pos = Tweets.objects.filter(created_at__range=[picked_start, picked_end], analysis=1).order_by('-polarity')
+    neg = Tweets.objects.filter(created_at__range=[picked_start, picked_end], analysis=-1).order_by('polarity')
+    neu = Tweets.objects.filter(created_at__range=[picked_start, picked_end], analysis=0).order_by('-subjectivity')
+    pos_tweets = serializers.serialize('json', pos)
+    neg_tweets = serializers.serialize('json', neg)
+    neu_tweets = serializers.serialize('json', neu)
 
-    data = serializers.serialize('json', all_tweets)
-    # print(data)
-
-    return HttpResponse(data, content_type="application/json")
+    return JsonResponse(data={
+        'pos_tweets': pos_tweets,
+        'neg_tweets': neg_tweets,
+        'neu_tweets': neu_tweets
+    })
