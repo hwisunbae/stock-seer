@@ -3,7 +3,7 @@
 
 <head>
 
-  {% include "head_part.html" %}
+    {% include "head_part.html" %}
     <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v4.js"></script>
 
@@ -16,63 +16,63 @@
 
 <body id="page-top">
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
+<!-- Page Wrapper -->
+<div id="wrapper">
 
-        {% include "sidebar_part.html" %}
+    {% include "sidebar_part.html" %}
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
 
-            <!-- Main Content -->
-            <div id="content">
+        <!-- Main Content -->
+        <div id="content">
 
             {% include "topbar_part.html" %}
 
-                <!-- Begin Page Content -->
-                <div id="loader" style="text-align:center; display:none;"><img src="../static/img/loader.gif" alt="loading"></div>
-                <div id="main-content" class="container-fluid">
+            <!-- Begin Page Content -->
+            <div id="loader" style="text-align:center; display:none;"><img src="../static/img/loader.gif" alt="loading"></div>
+            <div id="main-content" class="container-fluid">
 
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Trending Words</h1>
-                    <p class="mb-4">This page illustrates some of trending words that comes up the most during the date you picked.
-                        Weighted value in each word is computed based on IDF, short for inverse document frequency.
-                        This term frequency reflects how important a word is to a document in a corpus.
-                        The lower the IDF value, the less unique word appearing in the documents.
-                    </p>
+                <!-- Page Heading -->
+                <h1 class="h3 mb-2 text-gray-800">Trending Words</h1>
+                <p class="mb-4">This page illustrates some of trending words that comes up the most during the date you picked.
+                    Weighted value in each word is computed based on IDF, short for inverse document frequency.
+                    This term frequency reflects how important a word is to a document in a corpus.
+                    The lower the IDF value, the less unique word appearing in the documents.
+                </p>
 
-                     <div class="row">
-                        <div class="input-group mb-4 col-xl-10">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text" id="btnGroupAddon">Selected Date</div>
-                            </div>
-                            <input type="text" name="daterange" class="form-control" aria-label="Input group example" aria-describedby="btnGroupAddon" />
+                <div class="row">
+                    <div class="input-group mb-4 col-xl-10">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text" id="btnGroupAddon">Selected Date</div>
                         </div>
-                        <div class="buttons mb-4 col-xl-2">
-                            <button href="#" id="fetch-tweets" class="d-none d-sm-inline-block btn btn-middle btn-primary shadow-sm"><i
-                                    class="fas fa-download fa-sm text-white-50"></i> Fetch Tweets</button>
+                        <input type="text" name="daterange" class="form-control" aria-label="Input group example" aria-describedby="btnGroupAddon" />
+                    </div>
+                    <div class="buttons mb-4 col-xl-2">
+                        <button href="#" id="fetch-tweets" class="d-none d-sm-inline-block btn btn-middle btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Fetch Tweets</button>
+                    </div>
+                </div>
+
+                <!-- Content Row -->
+                <div class="row">
+
+                    <div class="col-xl12 col-lg-12">
+
+                        <!-- Area Chart -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Unique Word Cloud Chart</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-area wordcloud-wrapper" style="height:400px">
+                                    <div id="wordcloud-chart" style="height:400px"></div>
+                                </div>
+                                <hr>
+                                <div id="description"></div>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Content Row -->
-                    <div class="row">
-
-                        <div class="col-xl12 col-lg-12">
-
-                            <!-- Area Chart -->
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Unique Word Cloud Chart</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-area wordcloud-wrapper" style="height:400px">
-                                        <div id="wordcloud-chart" style="height:400px"></div>
-                                    </div>
-                                    <hr>
-                                    <div id="description"></div>
-                                </div>
-                            </div>
-                        </div>
 
 
                 </div>
@@ -81,26 +81,26 @@
             </div>
             <!-- End of Main Content -->
 
-          {% include "footer_part.html" %}
+            {% include "footer_part.html" %}
 
         </div>
         <!-- End of Content Wrapper -->
 
     </div>
     <!-- End of Page Wrapper -->
+</div>
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+{% include "modals_and_scripts_part.html" %}
 
-    {% include "modals_and_scripts_part.html" %}
+<!-- Page level plugins -->
+<script src="/static/vendor/chart.js/Chart.min.js"></script>
 
-    <!-- Page level plugins -->
-    <script src="/static/vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="/static/js/demo/word-cloud.js"></script>
+<!-- Page level custom scripts -->
+<script src="/static/js/demo/word-cloud.js"></script>
 
 </body>
 

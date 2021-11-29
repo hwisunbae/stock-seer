@@ -32,7 +32,7 @@
                     <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">Reading Tweets</h1>
                     <p class="mb-4">There are 3 tables provided by each tweet polarity: positive, negative and neutral tables.
-                        Due to high volumes of fetched tweets, each table is designed to display maximum 100 tweets ordered by polarity value.
+                        Due to high volumes of fetched tweets, each table is designed to display <b>maximum 100 tweets</b> ordered by polarity value.
                         When tweet ID is clicked, Twitter will look up the Status ID and automatically redirect you.</p>
 
                     <div class="row">
@@ -218,7 +218,7 @@
                 minDate: "2021/05/01",
                 maxDate: "2021/09/30",
             }, function (start, end, label) {
-                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                // alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
                 picked_start = start.format('YYYY-MM-DD')
                 picked_end = end.format('YYYY-MM-DD')
             })
@@ -241,9 +241,7 @@
                         table_neutral.draw()
                     },
                     success: function(data) {
-                        let count_pos = 0
-                        let count_neg = 0
-                        let count_neu = 0
+                        let count= 0
 
                         // console.log(data)
 
@@ -251,8 +249,12 @@
                         table_negative.clear()
                         table_neutral.clear()
 
-                        $.each(data, function(i, item) {
-                            if (item.fields.polarity > 0 && count_pos < 100) {
+                        let pos_tweets = JSON.parse(data.pos_tweets),
+                            neg_tweets = JSON.parse(data.neg_tweets),
+                            neu_tweets = JSON.parse(data.neu_tweets)
+
+                        $.each(pos_tweets, function(i, item){
+                            if (count < 100) {
                                 table_positive.row.add([
                                     `<a href="https://twitter.com/tweet/status/${item.fields.id}">${item.fields.id}</a>`,
                                     item.fields.created_at,
@@ -260,9 +262,14 @@
                                     item.fields.text,
                                     item.fields.polarity
                                 ])
-                                count_pos += 1
+                                count += 1
+                            }
+                        })
 
-                            } else if (item.fields.polarity < 0 && count_neg < 100) {
+                        count = 0
+
+                        $.each(neg_tweets, function(i, item){
+                            if (count < 100) {
                                 table_negative.row.add([
                                     `<a href="https://twitter.com/tweet/status/${item.fields.id}">${item.fields.id}</a>`,
                                     item.fields.created_at,
@@ -270,9 +277,14 @@
                                     item.fields.text,
                                     item.fields.polarity
                                 ])
-                                count_neg += 1
+                                count += 1
                             }
-                            else if (item.fields.polarity == 0 && count_neu < 100){
+                        })
+
+                        count = 0
+
+                        $.each(neu_tweets, function(i, item){
+                            if (count < 100) {
                                 table_neutral.row.add([
                                     `<a href="https://twitter.com/tweet/status/${item.fields.id}">${item.fields.id}</a>`,
                                     item.fields.created_at,
@@ -280,10 +292,8 @@
                                     item.fields.text,
                                     item.fields.polarity
                                 ])
-                                count_neu += 1
+                                count += 1
                             }
-                            // console.log(count_pos, count_neg, count_neu)
-
                         })
 
                     },

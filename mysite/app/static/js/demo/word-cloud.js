@@ -17,7 +17,7 @@ $(function() {
         minDate: "2021/05/01",
         maxDate: "2021/09/30",
     }, function (start, end, label) {
-        alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        // alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         picked_start = start.format('YYYY-MM-DD')
         picked_end = end.format('YYYY-MM-DD')
     })
