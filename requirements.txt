@@ -113,8 +113,6 @@ textblob==0.17.1
 textsearch==0.0.21
 threadpoolctl==3.0.0
 tqdm==4.62.3
-tweepy==4.1.0
-twint==2.1.21
 typing-extensions==3.10.0.2
 unicode==2.8
 urllib3==1.26.7
