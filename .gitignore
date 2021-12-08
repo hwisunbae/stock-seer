@@ -85,6 +85,8 @@ ENV/
 env.bak/ 
 venv.bak/ 
 *.env
+mac-env
+2mac-env
 
 # mkdocs documentation 
 /site 
@@ -116,3 +118,8 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
