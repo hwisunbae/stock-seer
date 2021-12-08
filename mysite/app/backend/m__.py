@@ -50,20 +50,21 @@ def get_data(obj_tweet_pol, obj_tweet_vol, obj_stock):
     df_pol = df_pol.merge(df_vol, how='inner', on='date')
     # print(df_pol)
 
-    # normalize polarity value
-    df_pol_max = df_pol['total_polarity'].max()
-    df_pol_min = df_pol['total_polarity'].min()
-    df_pol['total_polarity'] = (df_pol['total_polarity'] - df_pol_min) / df_pol_max
-    # print(df_pol)
+    # # normalize polarity value
+    # df_pol_max = df_pol['total_polarity'].max()
+    # df_pol_min = df_pol['total_polarity'].min()
+    # df_pol['total_polarity'] = (df_pol['total_polarity'] - df_pol_min) / df_pol_max
+    # # print(df_pol)
 
     df_stock = pd.DataFrame(list(obj_stock))
     df_stock['date'] = df_stock['date'].astype(str)
     # print(df_stock)
 
     df = df_pol.merge(df_stock, how='inner', on='date')
+    # print('------------- df')
     # print(df)
 
-    df['pct_change'] = df['adj_close'].pct_change()
+    # df['pct_change'] = df['adj_close'].pct_change()
     df.dropna(inplace=True)
     df.set_index('date', inplace=True)
     print('Calling from m__')
@@ -83,6 +84,10 @@ def get_feature_x_target_y(df):
     X, y = window_data(df, window_size, feature_col_number1, feature_col_number2, feature_col_number3,
                        target_col_number)  # (148, 9), (148, 1)
 
-    # Use 80% of the data for training and the remainder for testing
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=5)
+    # Use 70% of the data for training and the remainder for testing
+    X_split = int(.8 * len(X))
+    y_split = int(.8 * len(y))
+
+    X_train, X_test, y_train, y_test = \
+        X[:X_split], X[X_split:], y[:y_split], y[y_split:]
     return X_train, X_test, y_train, y_test
