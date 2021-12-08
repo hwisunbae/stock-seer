@@ -85,6 +85,8 @@ ENV/
 env.bak/ 
 venv.bak/ 
 *.env
+mac-env
+2mac-env
 
 # mkdocs documentation 
 /site 
