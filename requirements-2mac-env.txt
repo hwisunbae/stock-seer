@@ -27,7 +27,6 @@ defusedxml==0.7.1
 Django==4.0
 django-allauth==0.46.0
 django-rest-auth==0.9.5
-django.js==0.8.1
 djangorestframework==3.12.4
 elasticsearch==7.16.0
 emoji==1.6.1
@@ -55,6 +54,7 @@ httpx==0.21.1
 hyperframe==6.0.1
 idna==3.3
 importlib-metadata==4.8.2
+iniconfig==1.1.1
 joblib==1.1.0
 keras==2.7.0
 Keras-Preprocessing==1.1.2
@@ -73,7 +73,9 @@ opt-einsum==3.3.0
 packaging==21.3
 pandas==1.3.4
 Pillow==8.4.0
+pluggy==1.0.0
 protobuf==3.19.1
+py==1.11.0
 pyahocorasick==1.4.2
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
@@ -83,6 +85,7 @@ PyJWT==2.3.0
 PyMySQL==1.0.2
 pyparsing==3.0.6
 PySocks==1.7.1
+pytest==6.2.5
 python-dateutil==2.8.2
 python-dotenv==0.19.2
 python-socks==2.0.0
@@ -116,6 +119,7 @@ textblob==0.17.1
 textsearch==0.0.21
 Theano==1.0.5
 threadpoolctl==3.0.0
+toml==0.10.2
 tomli==1.2.2
 tqdm==4.62.3
 tweepy==4.4.0
