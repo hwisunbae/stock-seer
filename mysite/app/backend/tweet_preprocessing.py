@@ -5,9 +5,6 @@ import json
 import re
 import unidecode
 
-import googletrans
-from googletrans import Translator
-
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
